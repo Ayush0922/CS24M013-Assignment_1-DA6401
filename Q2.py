@@ -74,6 +74,15 @@ class CarnivalGame:
             self.activations.append(activation)
 
         return self.activations[-1]
+    def hit_targets(self, z):
+        """ReLU activation function"""
+        return np.maximum(0, z)
+
+    def assign_prizes_softmax(self, z):
+        """Softmax activation function"""
+        exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))  # For numerical stability
+        return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+
 
 
 
