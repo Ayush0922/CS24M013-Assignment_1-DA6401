@@ -53,6 +53,27 @@ class CarnivalGame:
             # Initialize biases with small random values
             bias_vector = np.random.randn(1, self.neurons[i + 1]) * 0.01
             self.biases.append(bias_vector)
+    def play_game(self, x):
+        """
+        Play the Carnival Game (Forward Propagation).
+        :param x: Input data (numpy array of shape (batch_size, input_size)).
+        :return: Output of the game (numpy array of shape (batch_size, output_size)).
+        """
+        self.activations = [x]  # Store activations for each layer
+        self.z_values = []      # Store z values (before activation) for each layer
+
+        for i in range(len(self.weights)):
+            z = np.dot(self.activations[-1], self.weights[i]) + self.biases[i]
+            self.z_values.append(z)
+            if i == len(self.weights) - 1:
+                # Final layer: use softmax activation 
+                activation = self.assign_prizes_softmax(z)
+            else:
+                # Hidden layers: use ReLU activation 
+                activation = self.hit_targets(z)
+            self.activations.append(activation)
+
+        return self.activations[-1]
 
 
 
