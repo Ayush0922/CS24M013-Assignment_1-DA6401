@@ -97,3 +97,45 @@ class CarnivalGame:
 neurons_in_hidden_layers = [160, 160]  # Specify the number of neurons in each hidden layer
 carnival_game = CarnivalGame(neurons_in_hidden_layers)
 
+# Step 5: Play the Carnival Game for N Random Images
+def play_carnival_game(N):
+    """
+    Play the carnival game for N random images.
+    :param N: Number of random images to play the game with.
+    """
+    total_probability = np.zeros(10)  # To store the total probability for all rounds
+
+    for round in range(N):
+        print(f"\n--- Round {round + 1} ---")
+        # Select a random image
+        random_index = np.random.randint(0, len(carnival_images))
+        sample_image = carnival_images[random_index:random_index + 1]
+        true_label = np.argmax(carnival_labels[random_index])
+
+        # Display the true label and class name
+        print(f"True Label: {true_label} ({class_names[true_label]})")
+
+        # Predict the prize probabilities
+        class_probs = carnival_game.predict_prize(sample_image)
+        print("Class probabilities:")
+        
+        # Print class names in a row
+        print("Class:      ", end="")
+        for name in class_names:
+            print(f"{name: <15}", end="")
+        print()
+
+        # Print probabilities in a row
+        print("Probability:", end="")
+        for prob in class_probs[0]:
+            print(f"{prob: <15.4f}", end="")
+        print()
+
+        print("Sum of probabilities: ")
+        print(f"{np.sum(class_probs):.4f}")
+
+
+# Step 6: Let the User Decide How Many Rounds to Play
+N = int(input("Enter the number of rounds (N) you want to play: "))
+play_carnival_game(N)
+
