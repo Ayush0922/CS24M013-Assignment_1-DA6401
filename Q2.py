@@ -4,7 +4,9 @@ from keras.datasets import fashion_mnist
 
 # Step 1: Enter the Carnival Park (Load the Dataset)
 (carnival_images_train, carnival_labels_train), (carnival_images_test, carnival_labels_test) = fashion_mnist.load_data()
-
+# Step 2: Prepare the Carnival Game (Preprocess the Data)
+carnival_images = carnival_images_train.reshape(-1, 28 * 28).astype(np.float32) / 255.0  # Flatten and normalize
+#carnival_images_test = carnival_images_test.reshape(-1, 28 * 28).astype(np.float32) / 255.0  
 
 # Class names
 class_names = [
