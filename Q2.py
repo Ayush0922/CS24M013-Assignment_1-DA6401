@@ -95,4 +95,5 @@ class CarnivalGame:
 
 # Step 4: Set Up the Carnival Game (Initialize the Network)
 neurons_in_hidden_layers = [160, 160]  # Specify the number of neurons in each hidden layer
+carnival_game = CarnivalGame(neurons_in_hidden_layers)
 
