@@ -8,6 +8,13 @@ from keras.datasets import fashion_mnist
 carnival_images = carnival_images_train.reshape(-1, 28 * 28).astype(np.float32) / 255.0  # Flatten and normalize
 #carnival_images_test = carnival_images_test.reshape(-1, 28 * 28).astype(np.float32) / 255.0  
 
+# Convert labels to one-hot encoding
+def assign_prizes(labels, num_classes=10):
+    return np.eye(num_classes)[labels]
+
+carnival_labels = assign_prizes(carnival_labels_train)
+
+
 # Class names
 class_names = [
     "Half-Tshirt", 
