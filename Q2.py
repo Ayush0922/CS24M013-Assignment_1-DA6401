@@ -6,6 +6,19 @@ from keras.datasets import fashion_mnist
 (carnival_images_train, carnival_labels_train), (carnival_images_test, carnival_labels_test) = fashion_mnist.load_data()
 
 
+# Class names
+class_names = [
+    "Half-Tshirt", 
+    "Lower", 
+    "Full-Tshirt",
+    "Dress",
+    "Jacket", 
+    "Heels",
+    "Shirt", 
+    "Shoes", 
+    "Bag", 
+    "High-Ankle Sneakers"
+]
 
 
 
