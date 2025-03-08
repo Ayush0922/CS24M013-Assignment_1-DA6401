@@ -82,7 +82,7 @@ class CarnivalGame:
         """Softmax activation function"""
         exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))  # For numerical stability
         return exp_z / np.sum(exp_z, axis=1, keepdims=True)
-    ef predict_prize(self, x):
+    def predict_prize(self, x):
         """
         Predict the prize probabilities for the input data.
         :param x: Input data (numpy array of shape (batch_size, input_size)).
