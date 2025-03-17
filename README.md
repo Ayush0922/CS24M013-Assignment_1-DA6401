@@ -7,7 +7,6 @@ WandB Assignment Report link : https://api.wandb.ai/links/theperfectionist0922-i
 
 # How to run train.py and main.py :
 
-# Fashion-MNIST MLFFNN with Command-Line Arguments and Confusion Matrix
 
 This repository contains two Python scripts, `main.py` and `train.py`, to train a Multi-Layer Feedforward Neural Network (MLFFNN) on the Fashion-MNIST dataset. `train.py` is used to run `main.py` with specified command-line arguments for hyperparameter control. `main.py` evaluates the model's performance using a confusion matrix.
 
@@ -767,6 +766,5 @@ The Python script `Q8.py` does the following:
 -   **Validation Set:** Includes a validation set for monitoring model performance during training.
 -   **MSE Loss:** Uses Mean Squared Error (MSE) loss for training.
 
-## Output Example
 
 The script will run the hyperparameter sweep and log the results to your wandb dashboard. You can then analyze the performance of different hyperparameter configurations and select the best model based on the logged metrics, particularly the validation accuracy and MSE loss.
