@@ -205,3 +205,97 @@ class MLFFNN(WeightUpdater):
         update_function = update_functions.get(optimizer, lambda: self.update_sgd(gradients_w, gradients_b, learning_rate))
         update_function()
 
+# Main function
+def main():
+    args = sys.argv[1:]
+    config = {
+        "epochs": int(args[0]),
+        "num_hidden_layers": int(args[1]),
+        "hidden_size": int(args[2]),
+        "weight_decay": float(args[3]),
+        "learning_rate": float(args[4]),
+        "optimizer": args[5],
+        "batch_size": int(args[6]),
+        "weight_init": args[7],
+        "activation": args[8],
+        "momentum": 0.9,
+        "beta": 0.9,
+        "beta1": 0.9,
+        "beta2": 0.999
+    }
+
+    # Load and preprocess data
+    X_train, y_train, X_test, y_test = load_fashion_mnist()
+    X_train, X_test = preprocess_data(X_train, X_test)
+    y_train = one_hot_encode(y_train)
+    y_test = one_hot_encode(y_test)
+
+    # Split into training and validation sets
+    num_val = int(0.1 * len(X_train))
+    X_val = X_train[:num_val]
+    y_val = y_train[:num_val]
+    X_train = X_train[num_val:]
+    y_train = y_train[num_val:]
+
+    # Initialize the model
+    model = MLFFNN(
+        hidden_layers=[config["hidden_size"]] * config["num_hidden_layers"],
+        activation=config["activation"],
+        weight_init=config["weight_init"],
+        weight_decay=config["weight_decay"]
+    )
+
+    # Training loop
+    epoch = 0
+    while epoch < config["epochs"]:
+        i = 0
+        while i < len(X_train):
+            x_batch = X_train[i:i + config["batch_size"]]
+            y_batch = y_train[i:i + config["batch_size"]]
+            y_pred = model.forward(x_batch)
+            gradients_w, gradients_b = model.backward(x_batch, y_batch)
+            model.update_weights(
+                gradients_w, gradients_b,
+                optimizer=config["optimizer"],
+                learning_rate=config["learning_rate"],
+                momentum=config["momentum"],
+                beta=config["beta"],
+                beta1=config["beta1"],
+                beta2=config["beta2"]
+            )
+            i += config["batch_size"]
+        epoch += 1
+
+    # Evaluate on validation set
+    y_val_pred = model.forward(X_val)
+    y_val_pred_labels = np.argmax(y_val_pred, axis=1)
+    y_val_true_labels = np.argmax(y_val, axis=1)
+    val_accuracy = np.mean(y_val_pred_labels == y_val_true_labels) * 100
+
+    # Evaluate on test set
+    y_test_pred = model.forward(X_test)
+    y_test_pred_labels = np.argmax(y_test_pred, axis=1)
+    y_test_true_labels = np.argmax(y_test, axis=1)
+    test_accuracy = np.mean(y_test_pred_labels == y_test_true_labels) * 100
+
+    # Confusion matrix
+    confusion_matrix = np.zeros((10, 10), dtype=int)
+    for true, pred in zip(y_test_true_labels, y_test_pred_labels):
+        confusion_matrix[true][pred] += 1
+
+    # Output results
+    print(f"Validation Accuracy: {val_accuracy:.2f}%")
+    print(f"Test Accuracy: {test_accuracy:.2f}%")
+    print("Confusion Matrix:")
+    print(confusion_matrix)
+
+    # Plot confusion matrix using Seaborn
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(confusion_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=range(10), yticklabels=range(10))
+    plt.xlabel("Predicted Labels")
+    plt.ylabel("True Labels")
+    plt.title("Confusion Matrix")
+    plt.show()
+
+if __name__ == "__main__":
+    main()
