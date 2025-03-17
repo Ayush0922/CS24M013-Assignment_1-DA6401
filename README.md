@@ -1,7 +1,7 @@
 # CS24M013-Assignment_1-DA6401
 Feed-Forward neural network and Back Propagation from Scratch
 
-Q1:
+# Q1:
 # Fashion-MNIST Sample Images Visualization
 
 This repository contains a Python script to visualize sample images from the Fashion-MNIST dataset. It loads the dataset using Keras, displays one sample image for each category, and presents them in a grid using Matplotlib.
