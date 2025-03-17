@@ -123,3 +123,90 @@ class WeightUpdater:
             i += 1
         self.t += 1
 
+# MLFFNN class with inheritance for weight updates
+class MLFFNN(WeightUpdater):
+    def __init__(self, hidden_layers, activation, weight_init, weight_decay):
+        super().__init__()
+        self.hidden_layers = hidden_layers
+        self.activation = activation
+        self.weight_init = weight_init
+        self.weight_decay = weight_decay
+        self.weights = []
+        self.biases = []
+        self._initialize_weights()
+
+    def _initialize_weights(self):
+        layers = [784] + self.hidden_layers + [10]
+        i = 0
+        while i < len(layers) - 1:
+            if self.weight_init == "xavier":
+                limit = np.sqrt(6 / (layers[i] + layers[i + 1]))
+                self.weights.append(np.random.uniform(-limit, limit, (layers[i], layers[i + 1])))
+            else:
+                self.weights.append(np.random.randn(layers[i], layers[i + 1]) * 0.01)
+            self.biases.append(np.zeros((1, layers[i + 1])))
+            i += 1
+
+    def forward(self, x):
+        self.activations = [x]
+        self.z_values = []
+        i = 0
+        while i < len(self.weights):
+            z = np.dot(self.activations[-1], self.weights[i]) + self.biases[i]
+            self.z_values.append(z)
+            if i == len(self.weights) - 1:
+                activation = self._softmax(z)
+            else:
+                activation = self._activation_function(z)
+            self.activations.append(activation)
+            i += 1
+        return self.activations[-1]
+
+    def _activation_function(self, z):
+        activation_functions = {
+            "sigmoid": lambda z: 1 / (1 + np.exp(-z)),
+            "tanh": lambda z: np.tanh(z),
+            "relu": lambda z: np.maximum(0, z)
+        }
+        return activation_functions.get(self.activation, lambda z: z)(z)
+
+    def _softmax(self, z):
+        exp_z = np.exp(z - np.max(z, axis=1, keepdims=True))
+        return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+
+    def backward(self, x, y):
+        gradients_w = [np.zeros_like(w) for w in self.weights]
+        gradients_b = [np.zeros_like(b) for b in self.biases]
+        
+        error = self.activations[-1] - y
+        gradients_w[-1] = np.dot(self.activations[-2].T, error) + self.weight_decay * self.weights[-1]
+        gradients_b[-1] = np.sum(error, axis=0, keepdims=True)
+
+        i = len(self.weights) - 2
+        while i >= 0:
+            error = np.dot(error, self.weights[i + 1].T) * self._activation_derivative(self.z_values[i])
+            gradients_w[i] = np.dot(self.activations[i].T, error) + self.weight_decay * self.weights[i]
+            gradients_b[i] = np.sum(error, axis=0, keepdims=True)
+            i -= 1
+
+        return gradients_w, gradients_b
+
+    def _activation_derivative(self, z):
+        activation_derivatives = {
+            "sigmoid": lambda z: self.activations[-1] * (1 - self.activations[-1]),
+            "tanh": lambda z: 1 - np.tanh(z) ** 2,
+            "relu": lambda z: (z > 0).astype(float)
+        }
+        return activation_derivatives.get(self.activation, lambda z: 1)(z)
+
+    def update_weights(self, gradients_w, gradients_b, optimizer, learning_rate, **optimizer_params):
+        update_functions = {
+            "sgd": lambda: self.update_sgd(self, gradients_w, gradients_b, learning_rate),
+            "momentum": lambda: self.update_momentum(self, gradients_w, gradients_b, learning_rate, optimizer_params["momentum"]),
+            "nesterov": lambda: self.update_nesterov(self, gradients_w, gradients_b, learning_rate, optimizer_params["momentum"]),
+            "rmsprop": lambda: self.update_rmsprop(self, gradients_w, gradients_b, learning_rate, optimizer_params["beta"]),
+            "adam": lambda: self.update_adam(self, gradients_w, gradients_b, learning_rate, optimizer_params["beta1"], optimizer_params["beta2"]),
+            "nadam": lambda: self.update_nadam(self, gradients_w, gradients_b, learning_rate, optimizer_params["beta1"], optimizer_params["beta2"])
+        }
+        update_function = update_functions.get(optimizer, lambda: self.update_sgd(self, gradients_w, gradients_b, learning_rate))
+        update_function()
