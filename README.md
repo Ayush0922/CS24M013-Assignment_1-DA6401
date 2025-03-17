@@ -1,6 +1,9 @@
 # CS24M013-Assignment_1-DA6401
 Feed-Forward neural network and Back Propagation from Scratch
 
+Github link : https://github.com/Ayush0922/CS24M013-Assignment_1-DA6401
+WandB Assignment Report link : https://api.wandb.ai/links/theperfectionist0922-iit-madras/mqabl68a
+
 # Q1:
 # Fashion-MNIST Sample Images Visualization
 
