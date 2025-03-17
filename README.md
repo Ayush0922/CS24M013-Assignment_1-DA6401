@@ -2,7 +2,155 @@
 Feed-Forward neural network and Back Propagation from Scratch
 
 Github link : https://github.com/Ayush0922/CS24M013-Assignment_1-DA6401
+
 WandB Assignment Report link : https://api.wandb.ai/links/theperfectionist0922-iit-madras/mqabl68a
+
+# How to run train.py and main.py :
+
+# Fashion-MNIST MLFFNN with Command-Line Arguments and Confusion Matrix
+
+This repository contains two Python scripts, `main.py` and `train.py`, to train a Multi-Layer Feedforward Neural Network (MLFFNN) on the Fashion-MNIST dataset. `train.py` is used to run `main.py` with specified command-line arguments for hyperparameter control. `main.py` evaluates the model's performance using a confusion matrix.
+
+## Prerequisites
+
+Before running the scripts, ensure you have the following libraries installed:
+
+-   **Python 3.x**
+-   **NumPy**
+-   **Scikit-learn (sklearn)**
+-   **Matplotlib**
+-   **Seaborn**
+-   **TensorFlow/Keras**
+
+## Installation
+
+### Windows
+
+1.  **Install Python:** Download and install Python from the official website: [python.org](https://www.python.org/downloads/windows/). Make sure to check the box that says "Add Python to PATH" during installation.
+
+2.  **Install Libraries:** Open Command Prompt (cmd) and run the following commands:
+
+    ```bash
+    pip install numpy scikit-learn matplotlib seaborn tensorflow
+    ```
+
+### macOS
+
+1.  **Install Python:** macOS usually comes with Python pre-installed. However, it's recommended to install a newer version using Homebrew.
+
+    -   If you don't have Homebrew, install it:
+
+        ```bash
+        /bin/bash -c "$(curl -fsSL [https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh](https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh))"
+        ```
+
+    -   Install Python:
+
+        ```bash
+        brew install python
+        ```
+
+2.  **Install Libraries:** Open Terminal and run the following commands:
+
+    ```bash
+    pip3 install numpy scikit-learn matplotlib seaborn tensorflow
+    ```
+
+### Linux (Ubuntu/Debian)
+
+1.  **Install Python:**
+
+    ```bash
+    sudo apt update
+    sudo apt install python3 python3-pip
+    ```
+
+2.  **Install Libraries:**
+
+    ```bash
+    pip3 install numpy scikit-learn matplotlib seaborn tensorflow
+    ```
+
+### Linux (Fedora/CentOS)
+
+1.  **Install Python:**
+
+    ```bash
+    sudo dnf install python3 python3-pip
+    ```
+
+2.  **Install Libraries:**
+
+    ```bash
+    pip3 install numpy scikit-learn matplotlib seaborn tensorflow
+    ```
+
+## How to Run
+
+1.  **Clone the Repository:**
+
+    ```bash
+    git clone [repository_url]
+    cd [repository_directory]
+    ```
+
+2.  **Run `train.py` with Command-Line Arguments:**
+
+    Use the `train.py` script to pass hyperparameters to `main.py`. The order of the arguments is crucial:
+
+    ```bash
+    python3 train.py <epochs> <num_hidden_layers> <hidden_size> <weight_decay> <learning_rate> <optimizer> <batch_size> <weight_init> <activation>
+    ```
+
+    -   `<epochs>`: Number of training epochs (integer).
+    -   `<num_hidden_layers>`: Number of hidden layers (integer).
+    -   `<hidden_size>`: Size of each hidden layer (integer).
+    -   `<weight_decay>`: Weight decay (float).
+    -   `<learning_rate>`: Learning rate (float).
+    -   `<optimizer>`: Optimization algorithm (string, e.g., `sgd`, `momentum`, `adam`).
+    -   `<batch_size>`: Batch size (integer).
+    -   `<weight_init>`: Weight initialization method (string, e.g., `random`, `xavier`).
+    -   `<activation>`: Activation function (string, e.g., `sigmoid`, `tanh`, `relu`).
+
+    **Example:**
+
+    ```bash
+    python3 train.py 20 4 64 0.001 0.0005 adam 32 xavier relu
+    ```
+
+    This command will run `main.py` with 20 epochs, 4 hidden layers of size 64, weight decay of 0.001, learning rate of 0.0005, Adam optimizer, batch size of 32, Xavier weight initialization, and ReLU activation.
+
+3.  **View Output:**
+
+    `main.py` will print the validation accuracy, test accuracy, and the confusion matrix. It will also display a Matplotlib window showing the confusion matrix as a heatmap.
+
+## Code Description
+
+### `train.py`
+
+-   **Parses Command-Line Arguments:** Uses `argparse` to parse command-line arguments and sets default values.
+-   **Runs `main.py`:** Executes `main.py` with the parsed arguments using `subprocess.run`.
+
+### `main.py`
+
+-   **Loads and Preprocesses Data:** Loads the Fashion-MNIST dataset, preprocesses the images, and converts labels to one-hot encoding.
+-   **Splits Data:** Manually splits the training data into training and validation sets.
+-   **Defines WeightUpdater Class:** Implements various weight update methods (SGD, Momentum, Nesterov, RMSprop, Adam, Nadam).
+-   **Defines MLFFNN Class:** Implements the Multi-Layer Feedforward Neural Network (MLFFNN) with forward and backward propagation, activation functions (sigmoid, tanh, ReLU), and weight initialization (random, Xavier).
+-   **Training Loop:** Trains the model using the provided hyperparameters.
+-   **Evaluates Model:** Calculates validation and test accuracies.
+-   **Generates Confusion Matrix:** Computes the confusion matrix using NumPy.
+-   **Plots Confusion Matrix:** Displays the confusion matrix as a heatmap using seaborn and matplotlib.
+
+## Key Features
+
+-   **Command-Line Hyperparameter Control:** Uses `train.py` to control hyperparameters via command-line arguments.
+-   **Multiple Weight Update Methods:** Supports various optimization algorithms.
+-   **Activation Functions:** Supports sigmoid, tanh, and ReLU activation functions.
+-   **Weight Initialization:** Supports random and Xavier weight initialization.
+-   **Confusion Matrix Visualization:** Displays the confusion matrix as a heatmap for detailed evaluation.
+
+# Here is the guide to all other codes:
 
 # Q1:
 # Fashion-MNIST Sample Images Visualization
