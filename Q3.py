@@ -209,3 +209,76 @@ class MLFFNN(WeightUpdater):
         update_function = update_functions.get(optimizer, lambda: self.update_sgd(self, gradients_w, gradients_b, learning_rate))
         update_function()
 
+# Define the training function
+def train(config=None):
+    with wandb.init(config=config):
+        config = wandb.config
+        model = MLFFNN(
+            hidden_layers=[config.hidden_size] * config.num_hidden_layers,
+            activation=config.activation,
+            weight_init=config.weight_init,
+            weight_decay=config.weight_decay
+        )
+        epoch = 0
+        while epoch < config.epochs:
+            i = 0
+            while i < len(X_train):
+                x_batch = X_train[i:i + config.batch_size]
+                y_batch = y_train[i:i + config.batch_size]
+                y_pred = model.forward(x_batch)
+                gradients_w, gradients_b = model.backward(x_batch, y_batch)
+                model.update_weights(
+                    gradients_w, gradients_b,
+                    optimizer=config.optimizer,
+                    learning_rate=config.learning_rate,
+                    momentum=config.momentum,
+                    beta=config.beta,
+                    beta1=config.beta1,
+                    beta2=config.beta2
+                )
+                i += config.batch_size
+            
+            # Compute training loss and accuracy
+            y_train_pred = model.forward(X_train)
+            train_loss = -np.mean(np.log(y_train_pred[np.arange(len(y_train)), np.argmax(y_train, axis=1)]))
+            train_accuracy = np.mean(np.argmax(y_train_pred, axis=1) == np.argmax(y_train, axis=1))
+
+            # Compute validation loss and accuracy
+            y_val_pred = model.forward(X_val)
+            val_loss = -np.mean(np.log(y_val_pred[np.arange(len(y_val)), np.argmax(y_val, axis=1)]))
+            val_accuracy = np.mean(np.argmax(y_val_pred, axis=1) == np.argmax(y_val, axis=1))
+
+            # Log metrics
+            wandb.log({
+                "epoch": epoch,
+                "train_loss": train_loss,
+                "train_accuracy": train_accuracy,
+                "val_loss": val_loss,
+                "val_accuracy": val_accuracy
+            })
+            epoch += 1
+
+# Define the sweep configuration
+sweep_config = {
+    "method": "bayes",
+    "metric": {"name": "val_accuracy", "goal": "maximize"},
+    "parameters": {
+        "epochs": {"values": [5, 10]},
+        "num_hidden_layers": {"values": [3, 4, 5]},
+        "hidden_size": {"values": [32, 64, 128]},
+        "weight_decay": {"values": [0, 0.0005, 0.5]},
+        "learning_rate": {"values": [1e-3, 1e-4]},
+        "optimizer": {"values": ["sgd", "momentum", "nesterov", "rmsprop", "adam", "nadam"]},
+        "batch_size": {"values": [16, 32, 64]},
+        "weight_init": {"values": ["random", "xavier"]},
+        "activation": {"values": ["sigmoid", "tanh", "relu"]},
+        "momentum": {"values": [0.9]},
+        "beta": {"values": [0.9]},
+        "beta1": {"values": [0.9]},
+        "beta2": {"values": [0.999]}
+    }
+}
+
+# Initialize the sweep
+sweep_id = wandb.sweep(sweep_config, project="mlffnn-fashion-mnist")
+wandb.agent(sweep_id, train)
