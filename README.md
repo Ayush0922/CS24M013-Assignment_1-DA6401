@@ -238,3 +238,132 @@ The Python script `Q2.py` does the following:
 8.  **Prompts User for Rounds:** Asks the user to enter the number of rounds to play.
 9.  **Executes Game:** Calls the `play_carnival_game` function with the user-specified number of rounds.
 
+# Q3:
+# Fashion-MNIST Multi-Layer Feedforward Neural Network (MLFFNN) with Weight Updates and Hyperparameter Tuning using Weights & Biases (wandb)
+
+This code contains a Python script that implements a Multi-Layer Feedforward Neural Network (MLFFNN) for classifying images from the Fashion-MNIST dataset. It includes various weight update methods (SGD, Momentum, Nesterov, RMSprop, Adam, Nadam) and utilizes Weights & Biases (wandb) for hyperparameter tuning and experiment tracking.
+
+## Prerequisites
+
+Before running the script, ensure you have the following libraries installed:
+
+-   **Python 3.x**
+-   **NumPy**
+-   **TensorFlow/Keras**
+-   **Weights & Biases (wandb)**
+
+## Installation
+
+### Windows
+
+1.  **Install Python:** Download and install Python from the official website: [python.org](https://www.python.org/downloads/windows/). Make sure to check the box that says "Add Python to PATH" during installation.
+
+2.  **Install Libraries:** Open Command Prompt (cmd) and run the following commands:
+
+    ```bash
+    pip install numpy tensorflow wandb
+    ```
+
+### macOS
+
+1.  **Install Python:** macOS usually comes with Python pre-installed. However, it's recommended to install a newer version using Homebrew.
+
+    -   If you don't have Homebrew, install it:
+
+        ```bash
+        /bin/bash -c "$(curl -fsSL [https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh](https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh))"
+        ```
+
+    -   Install Python:
+
+        ```bash
+        brew install python
+        ```
+
+2.  **Install Libraries:** Open Terminal and run the following commands:
+
+    ```bash
+    pip3 install numpy tensorflow wandb
+    ```
+
+### Linux (Ubuntu/Debian)
+
+1.  **Install Python:**
+
+    ```bash
+    sudo apt update
+    sudo apt install python3 python3-pip
+    ```
+
+2.  **Install Libraries:**
+
+    ```bash
+    pip3 install numpy tensorflow wandb
+    ```
+
+### Linux (Fedora/CentOS)
+
+1.  **Install Python:**
+
+    ```bash
+    sudo dnf install python3 python3-pip
+    ```
+
+2.  **Install Libraries:**
+
+    ```bash
+    pip3 install numpy tensorflow wandb
+    ```
+
+## How to Run
+
+1.  **Clone the Repository:**
+
+    ```bash
+    git clone [repository_url]
+    cd [repository_directory]
+    ```
+
+2.  **Install Weights & Biases (wandb):**
+
+    If you haven't already, create a wandb account and log in:
+
+    ```bash
+    wandb login
+    ```
+
+3.  **Run the Script:**
+
+    ```bash
+    python Q3.py
+    ```
+
+    (Replace `Q3.py` with the actual name of your Python script.)
+
+4.  **View Results on wandb:**
+    After running the script, go to your wandb dashboard to view the sweep and the results of the hyperparameter tuning.
+
+## Code Description
+
+The Python script `mlffnn_fashion_mnist_wandb.py` does the following:
+
+1.  **Imports Libraries:** Imports necessary libraries (NumPy, wandb, and Keras).
+2.  **Loads and Preprocesses Data:** Loads the Fashion-MNIST dataset, preprocesses the images, and converts labels to one-hot encoding.
+3.  **Splits Data:** Manually splits the training data into training and validation sets.
+4.  **Defines WeightUpdater Class:** Implements various weight update methods (SGD, Momentum, Nesterov, RMSprop, Adam, Nadam).
+5.  **Defines MLFFNN Class:** Implements the Multi-Layer Feedforward Neural Network (MLFFNN) with forward and backward propagation, activation functions (sigmoid, tanh, ReLU), and weight initialization (random, Xavier).
+6.  **Defines train Function:** Implements the training loop, including forward and backward passes, weight updates, and logging metrics to wandb.
+7.  **Defines Sweep Configuration:** Sets up the hyperparameter sweep configuration for wandb.
+8.  **Initializes and Runs Sweep:** Initializes the wandb sweep and runs the agent to perform hyperparameter tuning.
+
+## Key Features
+
+-   **Multiple Weight Update Methods:** Supports various optimization algorithms.
+-   **Activation Functions:** Supports sigmoid, tanh, and ReLU activation functions.
+-   **Weight Initialization:** Supports random and Xavier weight initialization.
+-   **Hyperparameter Tuning:** Uses wandb for hyperparameter tuning and experiment tracking.
+-   **Validation Set:** Includes a validation set for monitoring model performance during training.
+
+## Output Example
+
+The script will run the hyperparameter sweep and log the results to your wandb dashboard. You can then analyze the performance of different hyperparameter configurations and select the best model.
