@@ -18,3 +18,101 @@ def preprocess_data(X_train, X_test):
 # Helper function to one-hot encode labels
 def one_hot_encode(labels, num_classes=10):
     return np.eye(num_classes)[labels]
+
+# Subclass for weight updates
+class WeightUpdater:
+    def __init__(self):
+        self.velocity_w = None
+        self.velocity_b = None
+        self.cache_w = None
+        self.cache_b = None
+        self.m_w = None
+        self.m_b = None
+        self.v_w = None
+        self.v_b = None
+        self.t = 1
+
+    def update_sgd(self, gradients_w, gradients_b, learning_rate):
+        i = 0
+        while i < len(self.weights):
+            self.weights[i] -= learning_rate * gradients_w[i]
+            self.biases[i] -= learning_rate * gradients_b[i]
+            i += 1
+
+    def update_momentum(self, gradients_w, gradients_b, learning_rate, momentum):
+        if self.velocity_w is None:
+            self.velocity_w = [np.zeros_like(w) for w in self.weights]
+            self.velocity_b = [np.zeros_like(b) for b in self.biases]
+        i = 0
+        while i < len(self.weights):
+            self.velocity_w[i] = momentum * self.velocity_w[i] + learning_rate * gradients_w[i]
+            self.velocity_b[i] = momentum * self.velocity_b[i] + learning_rate * gradients_b[i]
+            self.weights[i] -= self.velocity_w[i]
+            self.biases[i] -= self.velocity_b[i]
+            i += 1
+
+    def update_nesterov(self, gradients_w, gradients_b, learning_rate, momentum):
+        if self.velocity_w is None:
+            self.velocity_w = [np.zeros_like(w) for w in self.weights]
+            self.velocity_b = [np.zeros_like(b) for b in self.biases]
+        i = 0
+        while i < len(self.weights):
+            self.velocity_w[i] = momentum * self.velocity_w[i] + learning_rate * gradients_w[i]
+            self.velocity_b[i] = momentum * self.velocity_b[i] + learning_rate * gradients_b[i]
+            self.weights[i] -= (momentum * self.velocity_w[i] + learning_rate * gradients_w[i])
+            self.biases[i] -= (momentum * self.velocity_b[i] + learning_rate * gradients_b[i])
+            i += 1
+
+    def update_rmsprop(self, gradients_w, gradients_b, learning_rate, beta):
+        if self.cache_w is None:
+            self.cache_w = [np.zeros_like(w) for w in self.weights]
+            self.cache_b = [np.zeros_like(b) for b in self.biases]
+        i = 0
+        while i < len(self.weights):
+            self.cache_w[i] = beta * self.cache_w[i] + (1 - beta) * gradients_w[i] ** 2
+            self.cache_b[i] = beta * self.cache_b[i] + (1 - beta) * gradients_b[i] ** 2
+            self.weights[i] -= learning_rate * gradients_w[i] / (np.sqrt(self.cache_w[i]) + 1e-8)
+            self.biases[i] -= learning_rate * gradients_b[i] / (np.sqrt(self.cache_b[i]) + 1e-8)
+            i += 1
+
+    def update_adam(self, gradients_w, gradients_b, learning_rate, beta1, beta2):
+        if self.m_w is None:
+            self.m_w = [np.zeros_like(w) for w in self.weights]
+            self.m_b = [np.zeros_like(b) for b in self.biases]
+            self.v_w = [np.zeros_like(w) for w in self.weights]
+            self.v_b = [np.zeros_like(b) for b in self.biases]
+        i = 0
+        while i < len(self.weights):
+            self.m_w[i] = beta1 * self.m_w[i] + (1 - beta1) * gradients_w[i]
+            self.m_b[i] = beta1 * self.m_b[i] + (1 - beta1) * gradients_b[i]
+            self.v_w[i] = beta2 * self.v_w[i] + (1 - beta2) * gradients_w[i] ** 2
+            self.v_b[i] = beta2 * self.v_b[i] + (1 - beta2) * gradients_b[i] ** 2
+            m_w_hat = self.m_w[i] / (1 - beta1 ** self.t)
+            m_b_hat = self.m_b[i] / (1 - beta1 ** self.t)
+            v_w_hat = self.v_w[i] / (1 - beta2 ** self.t)
+            v_b_hat = self.v_b[i] / (1 - beta2 ** self.t)
+            self.weights[i] -= learning_rate * m_w_hat / (np.sqrt(v_w_hat) + 1e-8)
+            self.biases[i] -= learning_rate * m_b_hat / (np.sqrt(v_b_hat) + 1e-8)
+            i += 1
+        self.t += 1
+
+    def update_nadam(self, gradients_w, gradients_b, learning_rate, beta1, beta2):
+        if self.m_w is None:
+            self.m_w = [np.zeros_like(w) for w in self.weights]
+            self.m_b = [np.zeros_like(b) for b in self.biases]
+            self.v_w = [np.zeros_like(w) for w in self.weights]
+            self.v_b = [np.zeros_like(b) for b in self.biases]
+        i = 0
+        while i < len(self.weights):
+            self.m_w[i] = beta1 * self.m_w[i] + (1 - beta1) * gradients_w[i]
+            self.m_b[i] = beta1 * self.m_b[i] + (1 - beta1) * gradients_b[i]
+            self.v_w[i] = beta2 * self.v_w[i] + (1 - beta2) * gradients_w[i] ** 2
+            self.v_b[i] = beta2 * self.v_b[i] + (1 - beta2) * gradients_b[i] ** 2
+            m_w_hat = (beta1 * self.m_w[i] + (1 - beta1) * gradients_w[i]) / (1 - beta1 ** self.t)
+            m_b_hat = (beta1 * self.m_b[i] + (1 - beta1) * gradients_b[i]) / (1 - beta1 ** self.t)
+            v_w_hat = self.v_w[i] / (1 - beta2 ** self.t)
+            v_b_hat = self.v_b[i] / (1 - beta2 ** self.t)
+            self.weights[i] -= learning_rate * m_w_hat / (np.sqrt(v_w_hat) + 1e-8)
+            self.biases[i] -= learning_rate * m_b_hat / (np.sqrt(v_b_hat) + 1e-8)
+            i += 1
+        self.t += 1
