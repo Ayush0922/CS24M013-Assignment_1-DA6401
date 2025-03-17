@@ -210,3 +210,65 @@ class MLFFNN(WeightUpdater):
         }
         update_function = update_functions.get(optimizer, lambda: self.update_sgd(self, gradients_w, gradients_b, learning_rate))
         update_function()
+
+# Define the best configuration
+best_config = {
+    "epochs": 5,
+    "num_hidden_layers": 3,
+    "hidden_size": 128,
+    "weight_decay": 0,
+    "learning_rate": 1e-3,
+    "optimizer": "adam",
+    "batch_size": 32,
+    "weight_init": "xavier",
+    "activation": "relu",
+    "momentum": 0.9,
+    "beta": 0.9,
+    "beta1": 0.9,
+    "beta2": 0.999
+}
+
+# Initialize the model with the best configuration
+model = MLFFNN(
+    hidden_layers=[best_config["hidden_size"]] * best_config["num_hidden_layers"],
+    activation=best_config["activation"],
+    weight_init=best_config["weight_init"],
+    weight_decay=best_config["weight_decay"]
+)
+
+# Train the model
+epoch = 0
+while epoch < best_config["epochs"]:
+    i = 0
+    while i < len(X_train):
+        x_batch = X_train[i:i + best_config["batch_size"]]
+        y_batch = y_train[i:i + best_config["batch_size"]]
+        y_pred = model.forward(x_batch)
+        gradients_w, gradients_b = model.backward(x_batch, y_batch)
+        model.update_weights(
+            gradients_w, gradients_b,
+            optimizer=best_config["optimizer"],
+            learning_rate=best_config["learning_rate"],
+            momentum=best_config["momentum"],
+            beta=best_config["beta"],
+            beta1=best_config["beta1"],
+            beta2=best_config["beta2"]
+        )
+        i += best_config["batch_size"]
+    epoch += 1
+
+# Evaluate on test data
+y_test_pred = model.forward(X_test)
+y_test_pred_labels = np.argmax(y_test_pred, axis=1)
+y_test_true_labels = np.argmax(y_test, axis=1)
+
+# Generate confusion matrix
+conf_matrix = confusion_matrix(y_test_true_labels, y_test_pred_labels)
+
+# Plot confusion matrix
+plt.figure(figsize=(10, 8))
+sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=range(10), yticklabels=range(10))
+plt.xlabel("Predicted Labels")
+plt.ylabel("True Labels")
+plt.title("Confusion Matrix for Test Data")
+plt.show()
