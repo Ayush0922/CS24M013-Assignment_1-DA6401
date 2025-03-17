@@ -14,3 +14,24 @@ def parse_arguments():
     parser.add_argument("activation", type=str, nargs="?", default="tanh", help="Activation function (default: tanh)")
     
     return parser.parse_args()
+def main():
+    args = parse_arguments()
+    
+    # Convert config to command-line arguments for main.py
+    args_list = [
+        str(args.epochs),
+        str(args.num_hidden_layers),
+        str(args.hidden_size),
+        str(args.weight_decay),
+        str(args.learning_rate),
+        args.optimizer,
+        str(args.batch_size),
+        args.weight_init,
+        args.activation
+    ]
+    
+    # Run main.py with the specified configuration
+    subprocess.run(["python3", "main.py"] + args_list)
+
+if __name__ == "__main__":
+    main()
